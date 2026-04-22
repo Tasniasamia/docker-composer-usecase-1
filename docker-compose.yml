@@ -1,0 +1,60 @@
+services:
+  app1:
+    build: ./app
+    expose:
+      - "3000"
+    restart: always
+    environment:
+      - INSTANCE_NAME=App-1
+      - CHOKIDAR_USEPOLLING=1
+      - CHOKIDAR_INTERVAL=300
+    volumes:
+      - ./app:/app
+      - server_node_modules:/app/node_modules
+
+  app2:
+    build: ./app
+    expose:
+      - "3000"
+    restart: always
+    environment:
+      - INSTANCE_NAME=App-2
+      - CHOKIDAR_USEPOLLING=1
+      - CHOKIDAR_INTERVAL=300
+    volumes:
+      - ./app:/app
+      - server_node_modules2:/app/node_modules
+
+  app3:
+    build: ./app
+    expose:
+      - "3000"
+    restart: always
+    environment:
+      - INSTANCE_NAME=App-3
+      - CHOKIDAR_USEPOLLING=1
+      - CHOKIDAR_INTERVAL=300
+    volumes:
+      - ./app:/app
+      - server_node_modules3:/app/node_modules
+
+  nginx:
+    image: nginx:latest
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - app1
+      - app2
+      - app3
+
+volumes:
+  server_node_modules:
+  server_node_modules2:
+  server_node_modules3:
+
+
+
+  
