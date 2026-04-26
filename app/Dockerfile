@@ -1,12 +1,28 @@
-FROM node:24-alpine
-WORKDIR /app
+# part 1
+# FROM node:24-alpine
+# WORKDIR /app
 
-COPY package*.json ./
-RUN npm install --legacy-peer-deps
-RUN npm install -g nodemon       
-COPY . .
-EXPOSE 5050
+# COPY package*.json ./
+# RUN npm install --legacy-peer-deps
+# RUN npm install -g nodemon       
+# COPY . .
+# EXPOSE 5050
 
-CMD ["nodemon","index.js"]
+# CMD ["nodemon","index.js"]
 
 # MSYS_NO_PATHCONV=1 docker run -d --name assignment5-frontend-container --network assignment5-network --env-file .env -e CHOKIDAR_USEPOLLING=1 -e CHOKIDAR_INTERVAL=300 -e WATCHPACK_POLLING=true -p 3000:3000 -v "$PWD:/app" -v assignment5-frontend-node_modules:/app/node_modules -w //app assignment5-frontend:latest sh -lc "CI=true npm install --legacy-peer-deps && npx next dev --turbopack -H 0.0.0.0 -p 3000"
+
+
+FROM node:20-slim AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+FROM node:20-slim
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY --from=build /app/dist ./dist
+EXPOSE 3000
+CMD [ "node","dist/index.js" ]
